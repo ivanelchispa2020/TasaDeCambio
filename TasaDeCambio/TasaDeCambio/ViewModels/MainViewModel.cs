@@ -164,6 +164,7 @@ namespace TasaDeCambio.ViewModels
         #region constructor
         public MainViewModel()
         {
+            AppiService = new AppiService();
             AppiDialog = new AppiDialog();
             Title = Resources.Resource.Title;
             LoadRates();
@@ -177,6 +178,7 @@ namespace TasaDeCambio.ViewModels
         #endregion
 
         AppiDialog AppiDialog;
+        AppiService AppiService;
 
         #region comandos
 
@@ -256,7 +258,19 @@ namespace TasaDeCambio.ViewModels
             {
                 IsRunning = true;
                 Result = "Cargando.........";
-                try
+
+            var connection = await AppiService.CheckConnection();
+
+            if (!connection.IsSuccess)
+            {
+                Status = "Conexion mala";
+            }
+            else
+            {
+                Status = "Conexion OK";
+            }
+
+            try
                 {
                     var client = new HttpClient();
                     client.BaseAddress = new Uri("http://apiexchangerates.azurewebsites.net");
