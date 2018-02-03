@@ -7,7 +7,7 @@
     <ContentPage.Content>
         <StackLayout BackgroundColor="Black">
 
-            <Label Text="Tasa de Cambio"
+            <Label Text="{Binding Title}"
                    TextColor="DarkBlue" 
                    FontSize="Large"
                    FontAttributes="Bold"

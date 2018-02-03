@@ -8,6 +8,7 @@ using System.Net.Http;
 using System.Text;
 using System.Windows.Input;
 using TasaDeCambio.Models;
+using TasaDeCambio.Services;
 using Xamarin.Forms;
 
 namespace TasaDeCambio.ViewModels
@@ -123,6 +124,19 @@ namespace TasaDeCambio.ViewModels
         }
 
 
+        public string Title
+        {
+            get { return _Title; }
+            set
+            {
+                if (_Title != value)
+                {
+                    _Title = value;
+                    PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(Title)));
+                }
+            }
+        }
+
         #endregion
 
 
@@ -136,6 +150,7 @@ namespace TasaDeCambio.ViewModels
         bool _IsEnabled;
         string _Result;
         string _Status;
+        string _Title;
         #endregion
 
 
@@ -146,15 +161,22 @@ namespace TasaDeCambio.ViewModels
         #endregion
 
 
-
+        #region constructor
         public MainViewModel()
         {
+            AppiDialog = new AppiDialog();
+            Title = Resources.Resource.Title;
             LoadRates();
         }
 
+        #endregion
+
+        #region servicios
 
 
+        #endregion
 
+        AppiDialog AppiDialog;
 
         #region comandos
 
@@ -189,30 +211,30 @@ namespace TasaDeCambio.ViewModels
             convertCommmand();
         }
 
-        private void convertCommmand()
+        async  void convertCommmand()
         {
             if (string.IsNullOrEmpty(Amount))
             {
-                Application.Current.MainPage.DisplayAlert("Error", "Debes Ingresar un monto...", "Aceptar");
-                return;
+               await AppiDialog.ShowMessage("Error", "Debes Ingresar un monto...");
+               return;
             }
 
             decimal amount = 0;
             if (!decimal.TryParse(Amount, out amount))
             {
-                Application.Current.MainPage.DisplayAlert("Error", "Debes Ingresar un valor numerico...", "Aceptar");
+                await AppiDialog.ShowMessage("Error", "Debes Ingresar un valor numerico...");
                 return;
             }
 
             if (SourceRate == null)
             {
-                Application.Current.MainPage.DisplayAlert("Error", "Debes seleccionar una tasa de origen...", "Aceptar");
+                await AppiDialog.ShowMessage("Error", "Debes seleccionar una tasa de origen...");
                 return;
             }
 
             if (TargetRate == null)
             {
-                Application.Current.MainPage.DisplayAlert("Error", "Debes seleccionar una tasa de desttino...", "Aceptar");
+                await AppiDialog.ShowMessage("Error", "Debes seleccionar una tasa de destino...");
                 return;
             }
 
