@@ -1,0 +1,102 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://xamarin.com/schemas/2014/forms"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             BindingContext="{Binding Main, Source={StaticResource Locator}}"
+             x:Class="TasaDeCambio.Views.MainView">
+
+    <ContentPage.Content>
+        <StackLayout BackgroundColor="Black">
+
+            <Label Text="Tasa de Cambio"
+                   TextColor="DarkBlue" 
+                   FontSize="Large"
+                   FontAttributes="Bold"
+                   HorizontalOptions="Center">
+         </Label>
+
+
+            <Label            
+                    Text="Monto :"
+                    TextColor="Fuchsia"
+                    FontAttributes="Bold"
+                    FontSize="Large"
+                    VerticalOptions="Center">
+            </Label>
+            <Entry
+                    Text="{Binding Amount, Mode=TwoWay}"
+                    Placeholder="Ingrese Un Monto...">
+            </Entry>
+            <Label            
+                        Text="Tasa de origen :"
+                        TextColor="Fuchsia"
+                        FontAttributes="Bold"
+                        FontSize="Large">
+            </Label>
+            <Picker
+                    TextColor="Fuchsia"
+                    ItemDisplayBinding="{Binding Name}"
+                    ItemsSource="{Binding Rates}"
+                    SelectedItem="{Binding SourceRate, Mode=TwoWay}"
+                   >
+            </Picker>
+            <Label            
+                        Text="Tasa de destino :"
+                        TextColor="Fuchsia"
+                        FontAttributes="Bold"
+                        FontSize="Large">
+            </Label>
+
+            <Picker
+                     TextColor="Fuchsia"
+                    ItemDisplayBinding="{Binding Name}"
+                    ItemsSource="{Binding Rates}"
+                    SelectedItem="{Binding TargetRate, Mode=TwoWay}"
+                    >
+            </Picker>
+
+            <Image    HeightRequest="90"
+                    Source="cambiar.png">
+                <Image.GestureRecognizers>
+                    <TapGestureRecognizer Command="{Binding ChangeCommand}"/>
+                </Image.GestureRecognizers>
+            </Image>
+
+
+            <ActivityIndicator
+                IsRunning="{Binding IsRunning, Mode=TwoWay}">
+            </ActivityIndicator>
+
+            <Button
+                Command="{Binding ConvertCommmand}"
+                BackgroundColor="OrangeRed"
+                FontAttributes="Bold"
+                IsEnabled="{Binding IsEnabled, Mode=TwoWay}"
+                Text="Convert"
+                TextColor="White"
+                FontSize="Large"
+               >
+            </Button>
+
+            <Label
+                BackgroundColor="Black"
+                HorizontalTextAlignment="Center"
+                Text="{Binding Result, Mode=TwoWay}"
+                TextColor="LightPink"
+                FontAttributes="Bold"
+                FontSize="Large"
+                VerticalOptions="FillAndExpand"
+                VerticalTextAlignment="Center">
+            </Label>
+
+            <Label
+                HorizontalOptions="Center"
+                TextColor="GreenYellow"
+                FontAttributes="Bold"
+                FontSize="Large"
+                Text="{Binding Status, Mode=TwoWay}">
+            </Label>
+
+
+        </StackLayout>
+    </ContentPage.Content>
+</ContentPage>  
