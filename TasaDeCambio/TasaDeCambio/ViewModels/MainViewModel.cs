@@ -6,9 +6,11 @@ using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Net.Http;
 using System.Text;
+using System.Threading.Tasks;
 using System.Windows.Input;
 using TasaDeCambio.Models;
 using TasaDeCambio.Services;
+using tasas.Services;
 using Xamarin.Forms;
 
 namespace TasaDeCambio.ViewModels
@@ -151,6 +153,7 @@ namespace TasaDeCambio.ViewModels
         string _Result;
         string _Status;
         string _Title;
+        List<Tasa> rates;
         #endregion
 
 
@@ -166,6 +169,7 @@ namespace TasaDeCambio.ViewModels
         {
             AppiService = new AppiService();
             AppiDialog = new AppiDialog();
+            AppiDataService = new AppiDataService();
             Title = Resources.Resource.Title;
             LoadRates();
         }
@@ -174,11 +178,12 @@ namespace TasaDeCambio.ViewModels
 
         #region servicios
 
-
-        #endregion
-
         AppiDialog AppiDialog;
         AppiService AppiService;
+        AppiDataService AppiDataService;
+        #endregion
+
+
 
         #region comandos
 
@@ -263,43 +268,58 @@ namespace TasaDeCambio.ViewModels
 
             if (!connection.IsSuccess)
             {
-                Status = "Conexion mala";
+                LoadLocalData();
             }
             else
             {
-                Status = "Conexion OK";
+                await LoadDataFromAPI();
             }
 
-            try
-                {
-                    var client = new HttpClient();
-                    client.BaseAddress = new Uri("http://apiexchangerates.azurewebsites.net");
-                    var controller = "/api/Rates";
-                    var response = await client.GetAsync(controller);
-                    var result = await response.Content.ReadAsStringAsync();
-                    if (!response.IsSuccessStatusCode)
-                    {
-                        IsRunning = false;
-                        Result = result;
-                    }
-
-                    var rates = JsonConvert.DeserializeObject<List<Tasa>>(result);
-                    Rates = new ObservableCollection<Tasa>(rates);
-
-                    IsRunning = false;
-                    IsEnabled = true;
-                    Result = "Cargado";
-
-                }
-                catch (Exception ex)
-                {
-                    IsRunning = false;
-                    Result = "Error al cargar los datos. Intentelo nuevamente mas tarde. ERROR : " + ex.Message;
-                }
+            if (rates.Count == 0)
+            {
+                IsRunning = false;
+                IsEnabled = false;
+                Result = "No hay conexion a Internet." +
+                    "Intente nuevamente";
+                Status = "No hay tasas Cargadas.";
+                return;
             }
 
+            Rates = new ObservableCollection<Tasa>(rates);
+
+            IsRunning = false;
+            IsEnabled = true;
+            Result = "Listo para convertir...!";
+        }
 
 
+        void LoadLocalData()
+        {
+            rates = AppiDataService.Get<Tasa>(false);
+            Status = "Tasas obtenidas desde la BBDD.";
+        }
+
+        async Task LoadDataFromAPI()
+        {
+            var url = "http://apiexchangerates.azurewebsites.net"; //Application.Current.Resources["URLAPI"].ToString();
+
+            var response = await AppiService.GetList<Tasa>(
+                url,
+                "/api/Rates");
+
+            if (!response.IsSuccess)
+            {
+                LoadLocalData();
+                return;
+            }
+
+            // Storage data local
+            rates = (List<Tasa>)response.Result;
+            AppiDataService.DeleteAll<Tasa>();
+            AppiDataService.Save(rates);
+
+            Status = "Tasas descargadas desde Internet.";
+        }
 
 
 

@@ -40,7 +40,7 @@ namespace TasaDeCambio.Services
                 return new Response
                 {
                     IsSuccess = false,
-                    Message = "Check your internet settings.",
+                    Message = "Revisa la configuracion del internet",
                 };
             }
 
